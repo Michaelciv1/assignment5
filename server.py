@@ -56,7 +56,7 @@ def threaded_client(s):
             mesg = "Directories and files found under "+ currentDirectory +"\n"
             directoryList = os.listdir()
             if not directoryList:
-                client.send("This directory is empty".encode('utf-8'))
+                client.send("This directory is empty\n".encode('utf-8'))
             else:
                 for item in directoryList:
                     mesg += item + '\n'
