@@ -11,36 +11,46 @@ def main():
         print("Received from server:", directoryName)
 
         while True:
-            print("\nc: change directory\nl: list directory\nc: create file\nq: quit")
+            print("\nc: change directory\nl: list directory\nn: create file\nq: quit")
 
             userRequest(s)
-            fromServer = s.recv(1024).decode('utf-8')
-            print(fromServer)
 
 def userRequest(s):
     while True:
         mesg = input("Enter message to send: ")
         if mesg == 'l':
-            s.send(mesg.encode('utf-8'))
+            listDirectory(s, mesg)
+            # s.send(mesg.encode('utf-8'))
             break
         elif mesg == "c":
-            s.send(mesg.encode('utf-8'))
+            changeDirectory(s, mesg)
             break
         elif mesg == 'n':
-            s.send(mesg.encode('utf-8'))
+            createNewFile(s, mesg)
             break
         elif mesg == 'q':
             quit()
         else:
             print ("Invalid selection, please try again.")
 
-def changeDirectory():
+def changeDirectory(s, mesg):
+    # while True: 
+    newPath = input("Enter path, starting from current directory: ")
+    newMesg = mesg+newPath
+    s.send(newMesg.encode('utf-8'))
+
+    fromServer = s.recv(1024).decode('utf-8')
+    print(fromServer)
     return
 
-def listDirectory():
+def listDirectory(s, mesg):
+    s.send(mesg.encode('utf-8'))
+    fromServer = s.recv(1024).decode('utf-8')
+    print(fromServer)
     return
 
-def createNewFile():
+def createNewFile(s, mesg):
+   
     return
     
 
