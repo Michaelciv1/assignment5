@@ -1,3 +1,10 @@
+"""
+Michael Wallerius 
+Assignment 5 
+3/17/2021
+client.py
+"""
+
 import socket
 import sys
 
@@ -12,16 +19,16 @@ def main():
         print("Received from server:", directoryName)
 
         while True:
-            print("\nc: change directory\nl: list directory\nf: create file\nq: quit")
+            print("c: change directory\nl: list directory\nf: create file\nq: quit")
 
             userRequest(s)
 
 def userRequest(s):
+    """Prompts, reads in, and validates the user's choice of the 4 possible requests. Continues re-prompting until you get a valid choice.""" 
     while True:
         mesg = input("Enter choice: ")
         if mesg == 'l':
             listDirectory(s, mesg)
-            # s.send(mesg.encode('utf-8'))
             break
         elif mesg == "c":
             changeDirectory(s, mesg)
@@ -35,27 +42,29 @@ def userRequest(s):
             print ("Invalid selection, please try again.")
 
 def changeDirectory(s, mesg):
-    # while True: 
+    """changes directory on the server side"""
     newPath = input("Enter path, starting from current directory: ")
     newMesg = mesg+newPath
     s.send(newMesg.encode('utf-8'))
 
     fromServer = s.recv(1024).decode('utf-8')
-    print(fromServer)
+    print(fromServer,'\n')
     return
 
 def listDirectory(s, mesg):
+    """lists the current working directory on the server side"""
     s.send(mesg.encode('utf-8'))
     fromServer = s.recv(1024).decode('utf-8')
     print(fromServer)
     return
 
 def createNewFile(s, mesg):
+    """creates a new file in the current working directory, checks if the file already exists and prints an error"""
     newFile = input("Enter filename: ")
     newMesg = mesg+newFile
     s.send(newMesg.encode('utf-8'))
     fromServer = s.recv(1024).decode('utf-8')
-    print(fromServer)
+    print(fromServer,'\n')
     return
     
 

@@ -1,3 +1,10 @@
+"""
+Michael Wallerius 
+Assignment 5 
+3/17/2021
+server.py
+"""
+
 import socket 
 import sys
 import os
@@ -27,6 +34,7 @@ def main():
         t.start()
 
 def threaded_client(s):
+    """Creates a thread for each client that the user specifies in the command line argument"""
     try: 
         s.settimeout(15)
         (client, addr) = s.accept()
@@ -50,8 +58,8 @@ def threaded_client(s):
             if not directoryList:
                 client.send("This directory is empty".encode('utf-8'))
             else:
-                for file_folder in directoryList:
-                    mesg += file_folder
+                for item in directoryList:
+                    mesg += item + '\n'
                 client.send(str(mesg).encode('utf-8'))
         
         elif fromClient[0] == "c":
@@ -73,6 +81,7 @@ def threaded_client(s):
                     pass
                 returnMessage = "File created at " + currentDirectory
                 client.send(returnMessage.encode('utf-8'))
+
     client.close()
     s.close()
 
