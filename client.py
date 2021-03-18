@@ -1,7 +1,8 @@
 import socket
+import sys
 
 HOST = '127.0.0.1'
-PORT = 5552
+PORT = int(sys.argv[1])
 
 def main():
     with socket.socket() as s:
