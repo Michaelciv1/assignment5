@@ -1,42 +1,62 @@
 import socket 
 import sys
 import os
-from _thread import *
+import threading 
 
-HOST = "localhost"
-PORT = 5552
+def main():
+    HOST = "localhost"
+    PORT_LIST = [5552,5553,5554,5555]
+    if len(sys.argv) > 2 or int(sys.argv[1]) >= 5:
+        print("invalid command line input")
+        quit()
+    ClientCount = int(sys.argv[1])
+    threads = []
 
-print (sys.argv[0])
+    for port in range(ClientCount):
+        s = socket.socket()
+        try:
+            s.bind((HOST, PORT_LIST[port]))
+        except socket.error as e:
+            print(str(e))
 
-with socket.socket() as s:
-    s.bind((HOST, PORT))
-    print("Server hostname:", HOST, "port:", PORT)
-    s.listen()
-    (client, addr) = s.accept()
+        print('Waiting for a connection at',str(PORT_LIST[port]))
+        s.listen()
+
+        t = threading.Thread(target = threaded_client, args = (s, ))
+        threads.append(t)
+        t.start()
+
+def threaded_client(s):
+    try: 
+        s.settimeout(15)
+        (client, addr) = s.accept()
+    except socket.timeout:
+        print("timed out")
+        return
     mesg = os.getcwd()
+    print('sending',mesg)
     client.send(mesg.encode('utf-8'))
-    currentDirectory = os.getcwd()
-    
     while True:
+        currentDirectory = os.getcwd()
         fromClient = client.recv(1024).decode('utf-8')
 
         if not fromClient:
             break
-        print("This is",fromClient)
 
         if fromClient[0] == "l":
+            currentDirectory = os.getcwd()
             mesg = "Directories and files found under "+ currentDirectory +"\n"
             directoryList = os.listdir()
             if not directoryList:
                 client.send("This directory is empty".encode('utf-8'))
             else:
-                for item in directoryList:
-                    mesg += item + "\n"
+                for file_folder in directoryList:
+                    mesg += file_folder
                 client.send(str(mesg).encode('utf-8'))
         
         elif fromClient[0] == "c":
             try: 
-                os.chdir(currentDirectory+fromClient[1:])
+                os.chdir(currentDirectory+"/"+fromClient[1:])
                 currentDirectory = os.getcwd()
                 returnMessage = "Directory as been changed to " + currentDirectory
                 client.send(returnMessage.encode('utf-8'))
@@ -53,10 +73,11 @@ with socket.socket() as s:
                     pass
                 returnMessage = "File created at " + currentDirectory
                 client.send(returnMessage.encode('utf-8'))
-            
+    client.close()
+    s.close()
 
-        
-
             
+if __name__ == "__main__":
+    main()
         
         
