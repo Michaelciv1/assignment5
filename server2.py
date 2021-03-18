@@ -6,6 +6,9 @@ import threading
 def main():
     HOST = "localhost"
     PORT_LIST = [5552,5553,5554,5555]
+    if len(sys.argv) > 2 or int(sys.argv[1]) >= 5:
+        print("invalid command line input")
+        quit()
     ClientCount = int(sys.argv[1])
     threads = []
 
@@ -13,7 +16,6 @@ def main():
         s = socket.socket()
         try:
             s.bind((HOST, PORT_LIST[port]))
-            print(HOST,PORT_LIST[port])
         except socket.error as e:
             print(str(e))
 
@@ -31,8 +33,8 @@ def threaded_client(s):
     except socket.timeout:
         print("timed out")
         return
-    print('Connected to: ' + addr[0] + ':' + str(addr[1]))
     mesg = os.getcwd()
+    print('sending',mesg)
     client.send(mesg.encode('utf-8'))
     while True:
         currentDirectory = os.getcwd()
@@ -40,21 +42,21 @@ def threaded_client(s):
 
         if not fromClient:
             break
-        print("This is",fromClient)
 
         if fromClient[0] == "l":
+            currentDirectory = os.getcwd()
             mesg = "Directories and files found under "+ currentDirectory +"\n"
             directoryList = os.listdir()
             if not directoryList:
                 client.send("This directory is empty".encode('utf-8'))
             else:
                 for file_folder in directoryList:
-                    mesg += file_folder + "\n"
+                    mesg += file_folder
                 client.send(str(mesg).encode('utf-8'))
         
         elif fromClient[0] == "c":
             try: 
-                os.chdir(currentDirectory+fromClient[1:])
+                os.chdir(currentDirectory+"/"+fromClient[1:])
                 currentDirectory = os.getcwd()
                 returnMessage = "Directory as been changed to " + currentDirectory
                 client.send(returnMessage.encode('utf-8'))

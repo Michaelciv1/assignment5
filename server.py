@@ -30,8 +30,8 @@ with socket.socket() as s:
             if not directoryList:
                 client.send("This directory is empty".encode('utf-8'))
             else:
-                for file_folder in directoryList:
-                    mesg += file_folder + "\n"
+                for item in directoryList:
+                    mesg += item + "\n"
                 client.send(str(mesg).encode('utf-8'))
         
         elif fromClient[0] == "c":
