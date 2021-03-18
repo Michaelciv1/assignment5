@@ -11,13 +11,13 @@ def main():
         print("Received from server:", directoryName)
 
         while True:
-            print("\nc: change directory\nl: list directory\nn: create file\nq: quit")
+            print("\nc: change directory\nl: list directory\nf: create file\nq: quit")
 
             userRequest(s)
 
 def userRequest(s):
     while True:
-        mesg = input("Enter message to send: ")
+        mesg = input("Enter choice: ")
         if mesg == 'l':
             listDirectory(s, mesg)
             # s.send(mesg.encode('utf-8'))
@@ -25,7 +25,7 @@ def userRequest(s):
         elif mesg == "c":
             changeDirectory(s, mesg)
             break
-        elif mesg == 'n':
+        elif mesg == 'f':
             createNewFile(s, mesg)
             break
         elif mesg == 'q':
@@ -50,7 +50,11 @@ def listDirectory(s, mesg):
     return
 
 def createNewFile(s, mesg):
-   
+    newFile = input("Enter filename: ")
+    newMesg = mesg+newFile
+    s.send(newMesg.encode('utf-8'))
+    fromServer = s.recv(1024).decode('utf-8')
+    print(fromServer)
     return
     
 
